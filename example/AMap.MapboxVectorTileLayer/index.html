@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pbf Demo</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/normalize/8.0.1/normalize.min.css" />
+    <style>
+      #map,
+      #app {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+
+    <script src="https://unpkg.com/vue@2"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="map"></div>
+    </div>
+    <script src="//webapi.amap.com/maps?v=2.0&key=API_KEY&plugin=AMap.MapboxVectorTileLayer"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="./pbfconf.js"></script>
+    <script>
+      var app = new Vue({
+        el: "#app",
+        data: {
+          mapIns: null,
+          pbfLayer: null,
+        },
+        mounted() {
+          this.loadMap();
+        },
+        methods: {
+          loadMap() {
+            // 入参，需要时去除注释
+            // const queryParamsObject = {
+            // };
+
+            // 地图实例
+            this.mapIns = new AMap.Map("map", {
+              center: [111.286962, 30.69217],
+              showLabel: true,
+              zoom: 13,
+              layers: [],
+            });
+
+            // pbf图层
+            this.pbfLayer = new AMap.MapboxVectorTileLayer({
+              url: window.pbfUrl,
+              // url: window.pbfUrl + $.param(queryParamsObject),
+              zIndex: 9,
+              opacity: 1,
+              dataZooms: [3, 22],
+              zooms: [3, 22],
+              tileSize: 256,
+              styles: {
+                polygon: {
+                  sourceLayer: "default",
+                  color: function (obj, inject) {
+                    // console.log(obj);
+                    // 状态对应颜色
+                    var adoptStatusDict = {
+                      2: "#E9D9B1", // 已经认领
+                      1: "#ffee22", // 未认领
+                      3: "#fff",
+                    };
+                    return adoptStatusDict[obj.adopt_status];
+                  },
+                  borderColor: function (obj) {
+                    // 自定义polygon border颜色样式
+                    // var adoptStatusDict = {
+                    //   2: "#E9D9B1", // 已经认领
+                    //   1: '#ffee22' // 未认领
+                    // }
+                    return "#999";
+                  },
+                  borderWidth: 2,
+                  visible: 1,
+                },
+              },
+            });
+
+            this.mapIns.add(this.pbfLayer);
+
+            // pbf 点击事件
+            this.pbfLayer.on("click", (e) => {
+              var features = e.features;
+              if (features) {
+                var polygons = features.polygons;
+                if (polygons.length) {
+                  // 这是polygon所包含的田块信息
+                  var poly_properties = polygons[0]["properties"];
+                  console.log(`poly_properties:${JSON.stringify(poly_properties, null, 4)}`);
+                  // 示例输出结果
+                  // poly_properties = {
+                  //   area: 123.1,
+                  //   xaxis: 111.39902645336095,
+                  //   yaxis: 30.707165493009573,
+                  //   center: "111.39902645336096,30.707165493009573",
+                  //   address: "夷陵区龙泉镇梅花村",
+                  //   field_id: 1476405,
+                  //   field_name: "夷陵区龙泉镇梅花村476405",
+                  //   adopt_status: 1,
+                  // };
+                }
+              }
+            });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

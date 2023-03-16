@@ -1,0 +1,20 @@
+{
+  "name": "pbf-demo",
+  "author": "perchecc",
+  "version": "1.0.0",
+  "description": "pbf demo by AMap api",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve",
+    "proxy": "live-server --open=./index.html --port=8081 --proxy=/hzt:https://lygeoserver.shuxitech.com/hzt"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^11.2.0"
+  },
+  "dependencies": {
+    "live-server": "^1.2.2"
+  }
+}
+
